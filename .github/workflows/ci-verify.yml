@@ -1,0 +1,27 @@
+name: ci-verify
+on: push
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build shared
+        run: pnpm --filter @slippay/shared build
+      - name: Lint (tsc + eslint --max-warnings 0)
+        run: pnpm -r lint
+      - name: Workspace tests
+        run: pnpm -r test
+      - name: Build web
+        run: pnpm --filter @slippay/web build
+      - name: Build listener
+        run: pnpm --filter @slippay/listener build
