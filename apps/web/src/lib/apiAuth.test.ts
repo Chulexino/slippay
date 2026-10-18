@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // and the test never touches the network.
 const { getSession } = vi.hoisted(() => ({ getSession: vi.fn() }));
 
-vi.mock("./auth.tsx", () => ({ supabase: { auth: { getSession } } }));
+vi.mock("./supabase.ts", () => ({ supabase: { auth: { getSession } } }));
 
 import { authFetch } from "./apiAuth.ts";
 

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Anchor is only needed to satisfy mandate.ts's top-level import; the pure
 // derivation helpers and the class's account wiring are what we exercise. The
 // Program is swapped for a controllable stub so `methods` can be inspected.
-const anchor = vi.hoisted(() => ({ methods: {} as Record<string, any> }));
+const anchor = vi.hoisted(() => ({ methods: {} as Record<string, unknown> }));
 
 vi.mock("@coral-xyz/anchor", () => ({
   BN: class BN {
@@ -100,7 +100,7 @@ describe("SlippayMandate", () => {
   it("charge delegates to the agent and passes the mandate + token accounts", async () => {
     const rpc = vi.fn(async () => "CHARGE_SIG");
     const accounts = vi.fn(() => ({ rpc }));
-    const charge = vi.fn(() => ({ accounts }));
+    const charge = vi.fn((_amount: unknown) => ({ accounts }));
     anchor.methods.charge = charge;
 
     const agent = Keypair.generate().publicKey;
@@ -112,7 +112,7 @@ describe("SlippayMandate", () => {
       m.charge({ owner, mint, agent, ownerToken, recipientToken, amount: new BN(500) }),
     ).resolves.toBe("CHARGE_SIG");
 
-    expect(String(charge.mock.calls[0][0])).toBe("500");
+    expect(String(charge.mock.calls[0]![0])).toBe("500");
     expect(accounts).toHaveBeenCalledWith({
       agent, mandate: mandatePda(owner, mint), mint,
       ownerToken, recipientToken, tokenProgram: TOKEN_PROGRAM_ID,
