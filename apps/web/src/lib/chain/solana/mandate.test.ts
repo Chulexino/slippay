@@ -100,7 +100,9 @@ describe("SlippayMandate", () => {
   it("charge delegates to the agent and passes the mandate + token accounts", async () => {
     const rpc = vi.fn(async () => "CHARGE_SIG");
     const accounts = vi.fn(() => ({ rpc }));
-    const charge = vi.fn((_amount: unknown) => ({ accounts }));
+    // Declare the parameter so mock.calls is [arg][] rather than the empty
+    // tuple [] — the assertion below reads the amount off that argument.
+    const charge = vi.fn((_: unknown) => ({ accounts }));
     anchor.methods.charge = charge;
 
     const agent = Keypair.generate().publicKey;
